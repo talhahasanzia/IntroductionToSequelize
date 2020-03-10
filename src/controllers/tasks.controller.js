@@ -1,45 +1,45 @@
 const service = require('../service/tasks.service');
 
-function getRecord(req, res) {
+async function getRecord(req, res) {
   const isEmpty = obj => Object.keys(obj).length <= 0;
   if (!isEmpty(req.query)) {
     res.status(200).send(service.find(req.query));
     return;
   }
-  res.status(200).send(service.findAll());
+  res.status(200).send(await service.findAll());
 }
 
-function getRecordById(req, res) {
+async function getRecordById(req, res) {
   try {
     const id = req.params.id;
-    const task = service.find({ id });
-    res.send(task);
+    const task = await service.find({ id });
+    res.send(task[0]);
   } catch (e) {
     res.status(400).send(e.message);
   }
   res.send();
 }
 
-function searchRecord(req, res) {
+async function searchRecord(req, res) {
   try {
     const task = req.body;
     console.log(task);
-    res.send(service.find(task));
+    res.send(await service.find(task));
   } catch (e) {
     res.status(400).send(e.message);
   }
   res.send();
 }
 
-function postRecord(req, res) {
+async function postRecord(req, res) {
   const task = req.body;
-  const record = service.insert(task);
+  const record = await service.insert(task);
   res.status(201).send(record);
 
   res.send();
 }
 
-function putRecord(req, res) {
+async function putRecord(req, res) {
   const task = req.body;
   const record = service.update(task);
   res.status(201).send(record);
@@ -47,11 +47,11 @@ function putRecord(req, res) {
   res.send();
 }
 
-function deleteRecord(req, res) {
+async function deleteRecord(req, res) {
   try {
     const id = req.params.id;
-    const tasks = service.deleteById(id);
-    res.status(400).send(tasks);
+    const tasks = await service.deleteById(id);
+    res.status(201).send(tasks);
   } catch (e) {
     if (e.message === 'ID_NOT_FOUND') {
       res.status(400).send('invalid task id');

@@ -1,23 +1,26 @@
 const tasks = require('../models/tasks.model');
 const { states, stateHirarchy } = require('../constants/taskStates');
 
-function findAll() {
-  return tasks;
+async function findAll() {
+  const task = await tasks.findAll({});
+  return task;
 }
 
-function find(searchBy = {}) {
-  const byId = searchBy.id;
-  const byTitle = searchBy.title;
-  const byDetails = searchBy.details;
-  const byDueDate = searchBy.dueDate;
-  const byState = searchBy.state;
+async function find(searchBy = {}) {
+  // const byId = searchBy.id;
+  // const byTitle = searchBy.title;
+  // const byDetails = searchBy.details;
+  // const byDueDate = searchBy.dueDate;
+  // const byState = searchBy.state;
 
-  let task = tasks;
-  if (byId) task = task.filter(u => u.id == byId);
-  if (byTitle) task = task.filter(u => u.title == byTitle);
-  if (byDetails) task = task.filter(u => u.details == byDetails);
-  if (byDueDate) task = task.filter(u => u.dueDate == byDueDate);
-  if (byState) task = task.filter(u => u.state == byState);
+  // let task = tasks;
+  // if (byId) task = task.filter(u => u.id == byId);
+  // if (byTitle) task = task.filter(u => u.title == byTitle);
+  // if (byDetails) task = task.filter(u => u.details == byDetails);
+  // if (byDueDate) task = task.filter(u => u.dueDate == byDueDate);
+  // if (byState) task = task.filter(u => u.state == byState);
+
+  const task = await tasks.findAll({ where: searchBy });
 
   if (!task.length) {
     throw new Error('task not found');
@@ -33,40 +36,51 @@ function findOne(name) {
   return task;
 }
 
-function insert(task) {
-  const id = Math.max(...tasks.map(u => u.id)) + 1;
-  const newtask = {
-    id,
-    ...task
-  };
-  tasks.push(newtask);
-  return tasks;
+async function insert(task) {
+  // const id = Math.max(...tasks.map(u => u.id)) + 1;
+  // const newtask = {
+  //   id,
+  //   ...task
+  // };
+  // tasks.push(newtask);
+  // return tasks;
+
+  return await tasks.build(task).save();
 }
 
-function update(task) {
-  const index = tasks.findIndex(u => u.id == task.id);
-  if (task === -1) throw new Error('ID_NOT_FOUND');
+async function update(task) {
+  const entity = await tasks.findOne({ where: { id: task.id } });
+  if (!entity) throw new Error('ID_NOT_FOUND');
 
-  _validateState(tasks[index].state, task.state);
+  _validateState(entity.state, task.state);
 
-  tasks[index].title = task.title;
-  tasks[index].details = task.details;
-  tasks[index].dueDate = task.dueDate;
-  tasks[index].state = task.state;
+  entity.title = task.title;
+  entity.details = task.details;
+  entity.dueDate = task.dueDate;
+  entity.state = task.state;
 
-  return tasks[index];
+  entity.save();
+
+  return task;
 }
 
-function deleteById(id) {
-  const delIdx = tasks.findIndex(u => u.id == id);
-  if (delIdx === -1) throw new Error('ID_NOT_FOUND');
-  tasks.splice(delIdx, 1);
-  return tasks;
+async function deleteById(id) {
+  // const delIdx = tasks.findIndex(u => u.id == id);
+  // if (delIdx === -1) throw new Error('ID_NOT_FOUND');
+  // tasks.splice(delIdx, 1);
+  // return tasks;
+
+  const entity = await tasks.findOne({ where: { id } });
+  if (!entity) throw new Error('ID_NOT_FOUND');
+
+  return await entity.destroy();
 }
 
 function _validateState(previousState, newState) {
   if (!states[newState]) throw new Error('STATE_NOT_FOUND');
   if (!states[previousState]) throw new Error('STATE_NOT_FOUND');
+
+  if (states[newState] === states[previousState]) return;
 
   if (stateHirarchy[previousState].findIndex(u => u == states[newState]) === -1)
     throw new Error('STATE_NOT_VALID');
