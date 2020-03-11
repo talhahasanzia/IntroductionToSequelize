@@ -1,18 +1,18 @@
 const service = require('../service/tasks.service');
 
-function getRecord(req, res) {
+async function getRecord(req, res) {
   const isEmpty = obj => Object.keys(obj).length <= 0;
   if (!isEmpty(req.query)) {
     res.status(200).send(service.find(req.query));
     return;
   }
-  res.status(200).send(service.findAll());
+  res.status(200).send(await service.findAll());
 }
 
-function getRecordById(req, res) {
+async function getRecordById(req, res) {
   try {
     const id = req.params.id;
-    const task = service.find({ id });
+    const task = await service.find({ id });
     res.send(task);
   } catch (e) {
     res.status(400).send(e.message);
@@ -31,9 +31,9 @@ function searchRecord(req, res) {
   res.send();
 }
 
-function postRecord(req, res) {
+async function postRecord(req, res) {
   const task = req.body;
-  const record = service.insert(task);
+  const record = await service.insert(task);
   res.status(201).send(record);
 
   res.send();

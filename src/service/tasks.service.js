@@ -1,21 +1,21 @@
 const repo = require('../reporsitories/tasks.repository');
 const { states } = require('../constants/taskStates');
 
-function findAll() {
-  return repo.findAll();
+async function findAll() {
+  return await repo.findAll();
 }
 
-function find(searchBy = {}) {
-  return repo.find(searchBy);
+async function find(searchBy = {}) {
+  return await repo.find(searchBy);
 }
 
 function findOne(name) {
   return repo.findOne(name);
 }
 
-function insert(task) {
+async function insert(task) {
   task.state = states.new;
-  return repo.insert(task);
+  return await repo.insert(task);
 }
 
 function update(task) {

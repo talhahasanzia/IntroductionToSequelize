@@ -1,28 +1,28 @@
 const tasks = require('../models/tasks.model');
 const { states, stateHirarchy } = require('../constants/taskStates');
 
-function findAll() {
-  return tasks;
+async function findAll() {
+  return await tasks.findAll({});
 }
 
-function find(searchBy = {}) {
-  const byId = searchBy.id;
-  const byTitle = searchBy.title;
-  const byDetails = searchBy.details;
-  const byDueDate = searchBy.dueDate;
-  const byState = searchBy.state;
+async function find(searchBy = {}) {
+  // const byId = searchBy.id;
+  // const byTitle = searchBy.title;
+  // const byDetails = searchBy.details;
+  // const byDueDate = searchBy.dueDate;
+  // const byState = searchBy.state;
 
-  let task = tasks;
-  if (byId) task = task.filter(u => u.id == byId);
-  if (byTitle) task = task.filter(u => u.title == byTitle);
-  if (byDetails) task = task.filter(u => u.details == byDetails);
-  if (byDueDate) task = task.filter(u => u.dueDate == byDueDate);
-  if (byState) task = task.filter(u => u.state == byState);
+  // let task = tasks;
+  // if (byId) task = task.filter(u => u.id == byId);
+  // if (byTitle) task = task.filter(u => u.title == byTitle);
+  // if (byDetails) task = task.filter(u => u.details == byDetails);
+  // if (byDueDate) task = task.filter(u => u.dueDate == byDueDate);
+  // if (byState) task = task.filter(u => u.state == byState);
 
-  if (!task.length) {
-    throw new Error('task not found');
-  }
-  return task;
+  // if (!task.length) {
+  //   throw new Error('task not found');
+  // }
+  return await tasks.findAll(searchBy);
 }
 
 function findOne(name) {
@@ -33,14 +33,14 @@ function findOne(name) {
   return task;
 }
 
-function insert(task) {
-  const id = Math.max(...tasks.map(u => u.id)) + 1;
-  const newtask = {
-    id,
-    ...task
-  };
-  tasks.push(newtask);
-  return tasks;
+async function insert(task) {
+  // const id = Math.max(...tasks.map(u => u.id)) + 1;
+  // const newtask = {
+  //   id,
+  //   ...task
+  // };
+  // tasks.push(newtask);
+  return await tasks.build(task).save();
 }
 
 function update(task) {
